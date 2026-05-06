@@ -1,3 +1,4 @@
+import json
 import logging
 import asyncio
 from aiogram import Bot, Dispatcher, types, F
@@ -30,7 +31,11 @@ def get_sheet():
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/drive",
     ]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    GOOGLE_CREDS = os.getenv("GOOGLE_CREDS")
+    if GOOGLE_CREDS:
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(GOOGLE_CREDS), scope)
+    else:
+        creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
     client = gspread.authorize(creds)
     return client.open_by_key(SPREADSHEET_ID).worksheet(SHEET_NAME)
 
